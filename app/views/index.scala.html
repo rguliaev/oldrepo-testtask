@@ -1,0 +1,89 @@
+@main("Test task") {
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Get value by index</h3>
+            <div>
+                <form>
+                    <label for="v1">v1</label>
+                    <input type="text" id="v1" name="v1">
+                </form>
+                <button class="submit" id="submitGet">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Post data</h3>
+            <div>
+                <form>
+                    <label for="v2">v2</label>
+                    <input type="text" id="v2" name="v2">
+
+                    <label for="v3">v3</label>
+                    <input type="text" id="v3" name="v3">
+
+                    <label for="v4">v4</label>
+                    <input type="text" id="v4" name="v4">
+                </form>
+                <button class="submit" id="submitPost">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-success" class="alert alert-success alert-dismissible" role="alert"></div>
+    <div id="alert-error" class="alert alert-danger alert-dismissible" role="alert"></div>
+
+</div>
+
+
+<script type="text/javascript" charset="utf-8">
+    $("#submitGet").click(function() {
+        var n = $("#v1").val();
+        $.ajax({
+            type: "GET",
+            url: "/get/" + n,
+            data: {},
+            dataType: "json",
+            success: function(data, textStatus, xhr) {
+                if(data.result.status == 200) {
+                   success(data.data)
+                } else {
+                    error(data.msg)
+                }
+            }
+        })
+    });
+
+    $("#submitPost").click(function() {
+        var v2 = $("#v2").val();
+        var v3 = $("#v3").val();
+        var v4 = $("#v4").val();
+        $.ajax({
+            type: "POST",
+            url: "/post/" + v2 + "/" + v3 + "/" + v4 ,
+            data: {},
+            dataType: "json",
+            success: function(data, textStatus, xhr) {
+                if(data.result.status == 200) {
+                   success(data.data)
+                } else {
+                    error(data.msg)
+                }
+            }
+        })
+    });
+    function success(data){
+        $("#alert-success").html(data);
+        $("#alert-success").show();
+        $("#alert-success").delay(2000).fadeOut("slow");
+    };
+    function error(data){
+        $("#alert-error").html(data);
+        $("#alert-error").show();
+        $("#alert-error").delay(2000).fadeOut("slow");
+    };
+</script>
+
+}

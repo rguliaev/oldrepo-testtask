@@ -1,0 +1,18 @@
+body {
+    margin-top: 20px;
+}
+
+#alert-success{
+    display:none;
+    z-index:2000;
+    position: fixed;
+    right:30px;
+    top:60px;
+}
+#alert-error{
+    display:none;
+    position: fixed;
+    z-index:2000;
+    right:30px;
+    top:60px;
+}
