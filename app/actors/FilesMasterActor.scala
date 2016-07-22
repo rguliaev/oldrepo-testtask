@@ -30,7 +30,7 @@ class FilesMasterActor @Inject() (environment: Environment, configuration: Confi
         }
         bufferedSource.close
       } getOrElse {
-        sender ! Left("Can't read f2.csv")
+        sender ! Left(s"Can't read ${get.filename}")
       }
     case SaveNumberList(ls) =>
       environment.getExistingFile(s"$filesFolder/${GetNumberList(2).filename}").map { file =>
