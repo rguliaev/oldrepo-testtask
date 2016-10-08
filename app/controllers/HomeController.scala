@@ -1,16 +1,16 @@
 package controllers
 
 import javax.inject._
-import actors.{SaveNumberList, GetNumberList, FilesMasterActor}
-import akka.actor.{Props, ActorSystem}
+import actors.{FilesMasterActor, GetNumberList, SaveNumberList}
+import akka.actor.{ActorSystem, Props}
 import akka.pattern.{AskTimeoutException, ask}
 import akka.util.Timeout
 import play.api.{Configuration, Environment}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNumber, JsString, Json}
 import play.api.mvc._
 import services.ApiSecurity
 import scala.concurrent.duration._
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class HomeController @Inject()(actorSystem: ActorSystem, environment: Environment, configuration: Configuration)(implicit exec: ExecutionContext) extends Controller with ApiSecurity {
@@ -40,27 +40,11 @@ class HomeController @Inject()(actorSystem: ActorSystem, environment: Environmen
       case Right(ls: List[BigDecimal]) =>
         if (ls.isDefinedAt(v1)) {
           val result = if(ls(v1) > 10) ls(v1) - 10 else ls(v1)
-          Ok(
-            Json.obj(
-              "result" -> Json.obj("status" -> 200),
-              "data" -> result
-            )
-          ).withToken
+          JsonAnswer(200,JsNumber(result))
         } else {
-          Ok(
-            Json.obj(
-              "result" -> Json.obj("status" -> 400),
-              "msg" -> s"No number found in file2 at index $v1"
-            )
-          ).withToken
+          JsonAnswer(400,JsString(s"No number found in file2 at index $v1"))
         }
-      case Left(msg: String) =>
-        Ok(
-          Json.obj(
-            "result" -> Json.obj("status" -> 400),
-            "msg" -> msg
-          )
-        ).withToken
+      case Left(msg: String) => JsonAnswer(400,JsString(msg))
     }
   }
 
@@ -73,30 +57,18 @@ class HomeController @Inject()(actorSystem: ActorSystem, environment: Environmen
           val data = if (firstList(v3) + v2 < 10) (1,firstList(v3) + v2 + 10) else (2,firstList(v3) + v2)
           val ls = secondList.splitAt(v4)._1 ++ List(data._2) ++ secondList.splitAt(v4)._2
           save(ls) map {
-            case Right(s) =>
-              Ok(
-                Json.obj(
-                  "result" -> Json.obj("status" -> 200),
-                  "data" -> data._1
-                )
-              ).withToken
-            case Left(msg: String) =>
-              Ok(
-                Json.obj(
-                  "result" -> Json.obj("status" -> 400),
-                  "msg" -> msg
-                )
-              ).withToken
+            case Right(s) => JsonAnswer(200,JsNumber(data._1))
+            case Left(msg: String) => JsonAnswer(400,JsString(msg))
           }
         } else {
           Future.successful(
-            Ok(
-              Json.obj(
-                "result" -> Json.obj("status" -> 400),
-                "msg" ->
-                  s"No number found in file${ if (firstList.isDefinedAt(v3)) 2 else 1 } at index ${ if (firstList.isDefinedAt(v3)) v4 else v3 }"
-              )
-            ).withToken
+            JsonAnswer(
+              400,
+              JsString(s"No number found in file${
+                if (firstList.isDefinedAt(v3)) 2 else 1
+              } at index ${
+                if (firstList.isDefinedAt(v3)) v4 else v3
+              }"))
           )
         }
       } else {
@@ -106,12 +78,7 @@ class HomeController @Inject()(actorSystem: ActorSystem, environment: Environmen
             nums._2.left.getOrElse("")
           ).sortBy(_.isEmpty).mkString(";")
         Future.successful(
-          Ok(
-            Json.obj(
-              "result" -> Json.obj("status" -> 400),
-              "msg" -> msgs
-            )
-          ).withToken
+          JsonAnswer(400,Json.toJson(msgs))
         )
       }
     }

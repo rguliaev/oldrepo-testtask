@@ -2,8 +2,11 @@ package services
 
 import java.security.MessageDigest
 import java.util.UUID
+
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.Results.Status
 import play.api.mvc.{RequestHeader, Result}
-import scala.concurrent.Future
+
 
 trait ApiSecurity {
   val sessionId = "sessionId"
@@ -18,4 +21,11 @@ trait ApiSecurity {
     }
   }
 
+  def JsonAnswer(status: Int = 200, jsObject: JsValue)(implicit request: RequestHeader): Result =
+    Status(status).apply(
+      Json.obj(
+        "result" -> Json.obj("status" -> status),
+        "data" -> jsObject
+      )
+    ).withToken
 }

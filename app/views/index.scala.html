@@ -41,44 +41,54 @@
 <script type="text/javascript" charset="utf-8">
     $("#submitGet").click(function() {
         var n = $("#v1").val();
-        $.ajax({
-            type: "GET",
-            url: "/get/" + n,
-            data: {},
-            dataType: "json",
-            success: function(data, textStatus, xhr) {
-                if(data.result.status == 200) {
-                   success(data.data)
-                } else {
-                    error(data.msg)
+
+        if(n.isEmpty){
+            error("Incorrect input")
+        } else {
+            $.ajax({
+                type: "GET",
+                url: "/get/" + n,
+                data: {},
+                dataType: "json",
+                success: function(data, textStatus, xhr) {
+                    success(data.data)
+                },
+                error: function(data, textStatus, xhr) {
+                    error(data.responseJSON.data)
                 }
-            }
-        })
+            });
+        }
     });
 
     $("#submitPost").click(function() {
         var v2 = $("#v2").val();
         var v3 = $("#v3").val();
         var v4 = $("#v4").val();
-        $.ajax({
-            type: "POST",
-            url: "/post/" + v2 + "/" + v3 + "/" + v4 ,
-            data: {},
-            dataType: "json",
-            success: function(data, textStatus, xhr) {
-                if(data.result.status == 200) {
-                   success(data.data)
-                } else {
-                    error(data.msg)
+
+        if(v2.isEmpty || v3.isEmpty || v4.isEmpty){
+            error("Incorrect input")
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "/post/" + v2 + "/" + v3 + "/" + v4 ,
+                data: {},
+                dataType: "json",
+                success: function(data, textStatus, xhr) {
+                    success(data.data)
+                },
+                error: function(data, textStatus, xhr) {
+                    error(data.responseJSON.data)
                 }
-            }
-        })
+            });
+        }
     });
+
     function success(data){
         $("#alert-success").html(data);
         $("#alert-success").show();
         $("#alert-success").delay(2000).fadeOut("slow");
     };
+
     function error(data){
         $("#alert-error").html(data);
         $("#alert-error").show();

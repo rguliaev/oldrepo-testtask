@@ -1,6 +1,6 @@
 package actors
 
-import akka.actor.{Props, Actor}
+import akka.actor.Actor
 import javax.inject._
 import play.api.{Environment, Configuration}
 import scala.io.Source
@@ -18,19 +18,19 @@ class FilesMasterActor @Inject() (environment: Environment, configuration: Confi
   val filesFolder = configuration.getString("filesPath").getOrElse("files")
 
   def receive = {
-    case get: GetNumberList =>
-      environment.getExistingFile(s"$filesFolder/${get.filename}").map { file =>
+    case GetNumberList(filename) =>
+      environment.getExistingFile(s"$filesFolder/$filename").map { file =>
         val bufferedSource = Source.fromFile(file)
         bufferedSource.getLines.toList.map { line =>
           line.split(",").map ( n => BigDecimal(n.trim)).toList
         }.headOption.map { ls =>
           sender ! Right(ls)
         } getOrElse {
-          sender ! Left(s"Empty ${get.filename}")
+          sender ! Left(s"Empty $filename")
         }
         bufferedSource.close
       } getOrElse {
-        sender ! Left(s"Can't read ${get.filename}")
+        sender ! Left(s"Can't read $filename")
       }
     case SaveNumberList(ls) =>
       environment.getExistingFile(s"$filesFolder/${GetNumberList(2).filename}").map { file =>
