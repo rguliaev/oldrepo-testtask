@@ -1,49 +1,57 @@
-This is your new Play application
+This is Play application
 =================================
 
-This file will be packaged with your application when using `activator dist`.
+Test task - simple frontend/backend application for number calculation.
 
-There are several demonstration files available in this template.
+Backend part:
+* Multiuser web service (with tests) implemented in Scala, calculating certain fractional coefficients using rules described below.
 
-Controllers
-===========
+* Use Scala framework of your choice, web service should use some JSON protocol of your choice.
 
-- HomeController.scala:
+* It is crucial to take into account possible concurrency issues.
 
-  Shows how to handle simple HTTP requests.
 
-- AsyncController.scala:
 
-  Shows how to do asynchronous programming when handling a request.
+Given two CSV files (called f1 and f2) containing numbers.
 
-- CountController.scala:
+* Input file f1 contains input numbers
 
-  Shows how to inject a component into a controller and use the component when
-  handling requests.
+* File f2 contains intermediate results, and is updatable.
 
-Components
-==========
+There are two WS calls:
 
-- Module.scala:
+1. Get (v1) - get v1-th result, that is, number with index v1 (indexing is zero-based) from file 2, make the following transformation and return result to the client:
 
-  Shows how to use Guice to bind all the components needed by your application.
 
-- Counter.scala:
 
-  An example of a component that contains state, in this case a simple counter.
+if f2[v1] > 10,
 
-- ApplicationTimer.scala:
+then return f2[v1] - 10
 
-  An example of a component that starts when the application starts and stops
-  when the application stops.
+else return f2[v1]
 
-Filters
-=======
 
-- Filters.scala:
 
-  Creates the list of HTTP filters used by your application.
+Parameters should be passed in URL.
 
-- ExampleFilter.scala
+2. Post (v2,v3,v4) does the following:
 
-  A simple filter that adds a header to every response.
+
+
+if ( f1[v3]+v2 ) < 10
+
+then f2[v4] = f1[v3]+v2 +10
+
+else f2[v4] = f1[v3]+v2
+
+storing result to the file f2 (assignment here means 'storing').
+
+Return 0 if the condition is 'true', 1 - if not.
+
+
+The project should be implemented as sbt project, which may be run and tested using sbt commands.
+
+Frontend part:
+
+As a part of this task, a simple SPA (single-page application) should be implemented. It should contain two areas, each having controls accepting input and displaying the result WITHOUT PAGE RELOADING, using Javascript.
+There should be styling of the UI, it should be done using CSS, similar to this form - http://www.w3schools.com/css/tryit.asp?filename=trycss_forms - and there should be two forms in the page .
